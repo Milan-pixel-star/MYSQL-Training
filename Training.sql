@@ -405,3 +405,150 @@ grant update (first_name) on user1 to aman;
 
 
 grant select (last_name) on user1 to bob12;
+
+create table employ(id int primary key auto_increment, dept varchar(20),salary int);
+
+insert into employ(dept,salary) values
+('hr',300),
+('hr',200),('hr',100),
+('marketing',70),('marketing',50),
+('marketing',100),('marketing',80),
+('dsa',156),('dsa',200),
+('dsa',60),('dsa',900);
+
+select * from employ;
+
+select avg(salary) from employ;
+
+select id,dept,salary,(select avg(salary) from employ) from employ;
+
+
+ -- windows function
+select id,dept, salary, avg(salary) over() from employ;
+
+
+select id,dept, salary, avg(salary) over(), avg(salary) over(partition by dept) from employ;
+
+select id,dept, salary, sum(salary) over(), sum(salary) over(partition by dept) from employ;
+
+select id,dept, salary, sum(salary) over(partition by dept), sum(salary) over(order by dept) from employ;
+
+select id,dept, salary, sum(salary) over(), sum(salary) over(partition by dept order by salary) from employ;
+
+
+-- rank , sense_rank
+
+select id,dept,salary,
+rank() over(order by salary) from employ;   -- rank function distribute the ranks and skips that rank	
+
+
+select id,dept,salary,
+dense_rank() over(order by salary) from employ;   -- rank does not skip on same ranks
+
+select id,dept,salary,
+rank() over(partition by dept order by salary) from employ;
+
+select id,dept,salary,
+dense_rank() over(partition by dept order by salary) from employ;
+
+-- using windos function n highest salary from the data -- ntile
+
+select id,dept,salary,
+dense_rank() over(order by salary) from employ;
+
+
+-- Views --> virtual table 
+-- views --> not physically --> give restriction 
+-- store complex query into a table i.e virtual
+
+select * from payment;
+create view v_payment as select payment_id, customer_id from payment;
+ select * from v_payment;
+ 
+ create table raj123(id int, salary int);
+ 
+ insert into raj123 values(1,200),(2,200);
+ 
+ create view virtual_raj as select id from raj123;
+ 
+ insert into virtual_raj value(30);
+
+select * from virtual_raj;
+
+select * from raj123;
+
+-- it is simple view which makes changes into the original data also
+
+create or replace view virtual_raj as
+select sum(salary) from raj123;
+
+select * from virtual_raj;
+
+insert into virtual_raj values(800);
+-- we can't update the complex view which are made from the aggeregerate and joins 
+
+
+
+-- Indxes --> it is a mechaniuse through which we can access the data faster 
+
+-- Indexes are of two types Inbuilt indexes or clustered indexes
+
+drop database test;
+create database test;
+
+use test;
+
+create table regex(id int primary key auto_increment,
+name varchar(20), salary int);
+
+insert into regex values(1,"Milan",10),(2,"Rana",20);
+
+select * from regex;
+
+desc regex;
+insert into regex(name,salary) values("Rana",20);
+
+show indexes from regex;
+
+-- b-tree is a default index
+
+explain select * from regex;
+
+create index regex_name_ind on regex(name);
+
+show indexes from regex;
+
+
+explain select * from regex where salary=20;
+
+explain select * from regex where name="Rana";
+
+drop index regex_name_ind on regex;
+
+-- making index on two values of a table
+
+select * from regex;
+insert into regex(name,salary) values("shivam",500),("tushar",600);
+
+create index regex_name on regex(name(2));
+
+show indexes from regex;
+ 
+explain select * from regex where name="tus%";
+
+explain select * from regex where name="isha%";
+
+explain select * from regex where name="Ra%";
+
+explain select * from regex where name like "Ra";
+
+explain select * from regex where name like "__%";
+
+
+show databases;
+
+
+
+
+-- Group by ,join, self join, inner join, natural join, subquery, views, why virtual table, windos function or analytical function
+-- find n highest salary
